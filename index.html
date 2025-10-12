@@ -1,0 +1,232 @@
+
+<!--
+ ____  ____  ____ 
+||l ||||u ||||x ||
+||__||||__||||__||
+|/__\||/__\||/__\|
+-->
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathéo Lenoir - Portfolio</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Boot Screen -->
+    <div id="boot-screen">
+        <img src="/img/mac-logo.png" alt="Macintosh" class="apple-logo">
+        <div class="loading-text">System Lux 1.0...</div>
+    </div>
+
+    <!-- Menu Bar -->
+    <div class="menu-bar">
+        <div class="menu-item apple clickable" onclick="toggleWindow('easter-egg-window')">
+            <img src="/img/mac-logo.png" alt="" style="width: 20px; height: 20px; vertical-align: middle; image-rendering: pixelated;">
+        </div>
+        <div class="menu-item clickable" onclick="toggleWindow('home-window')">Accueil</div>
+        <div class="menu-item clickable" onclick="toggleWindow('experience-window')">Expérience</div>
+        <div class="menu-item clickable" onclick="toggleWindow('projects-window')">Projets</div>
+        <div class="menu-item clickable" onclick="toggleWindow('contact-window')">Contact</div>
+    </div>
+
+    <!-- Desktop -->
+    <div class="desktop">
+        <!-- Home Window -->
+        <div id="home-window" class="window active">
+            <div class="window-header">
+                <div class="window-title">About Me</div>
+                <div class="window-buttons">
+                    <div class="window-button" onclick="closeWindow('home-window')">×</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="profile-header">
+                    <div class="profile-name">Mathéo Lenoir</div>
+                    <div class="profile-title">ÉTUDIANT EN BTS CIEL</div>
+                </div>
+                <div class="profile-bio">
+                    Passionné de systèmes informatiques et de développement, je poursuis un BTS CIEL pour approfondir mes compétences techniques et créatives. Mon objectif est de devenir un professionnel polyvalent capable de concevoir des solutions innovantes et de relever les défis technologiques de demain.
+                </div>
+                <div style="text-align: center; color: #666; font-size: 12px;">
+                    💻 Cliquez sur les menus pour explorer mon parcours
+                </div>
+            </div>
+        </div>
+
+        <!-- Experience Window -->
+        <div id="experience-window" class="window">
+            <div class="window-header">
+                <div class="window-title">Expérience</div>
+                <div class="window-buttons">
+                    <div class="window-button" onclick="closeWindow('experience-window')">×</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">2024 - Présent</div>
+                        <div class="timeline-title">BTS CIEL</div>
+                        <div class="timeline-company">Astus</div>
+                        <p>Formation en Cybersécurité, Informatique et réseaux, ÉLectronique avec un focus sur les systèmes embarqués et le développement logiciel.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2023</div>
+                        <div class="timeline-title">Stage Développeur Web</div>
+                        <div class="timeline-company">HSENEF - l'Informatique</div>
+                        <p>Développement d'applications web, maintenance de sites clients, et apprentissage des bonnes pratiques du développement professionnel.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2022</div>
+                        <div class="timeline-title">Projets Personnels</div>
+                        <div class="timeline-company">Autodidacte</div>
+                        <p>Création de sites web, exploration des langages de programmation et développement de petites applications pour consolider mes compétences.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects Window -->
+        <div id="projects-window" class="window">
+            <div class="window-header">
+                <div class="window-title">Projets</div>
+                <div class="window-buttons">
+                    <div class="window-button" onclick="closeWindow('projects-window')">×</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="projects-grid">
+                    <div class="project-card clickable" onclick="openProjectDetail('project1')">
+                        <div class="project-icon">🖥️</div>
+                        <div class="project-title">Projet 1</div>
+                        <div class="project-desc">Application de gestion de tâches développée en JavaScript avec interface rétro.</div>
+                    </div>
+                    <div class="project-card clickable" onclick="openProjectDetail('project2')">
+                        <div class="project-icon">🎮</div>
+                        <div class="project-title">Projet 2</div>
+                        <div class="project-desc">Mini-jeu développé en Python avec pygame, inspiré des classiques 8-bit.</div>
+                    </div>
+                    <div class="project-card clickable" onclick="openProjectDetail('project3')">
+                        <div class="project-icon">🌐</div>
+                        <div class="project-title">Projet 3</div>
+                        <div class="project-desc">Site web responsive pour une association locale avec système de gestion de contenu.</div>
+                    </div>
+                    <div class="project-card clickable" onclick="openProjectDetail('project4')">
+                        <div class="project-icon">⚙️</div>
+                        <div class="project-title">Projet 4</div>
+                        <div class="project-desc">Système embarqué avec Arduino pour la domotique intelligente.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Window -->
+        <div id="contact-window" class="window">
+            <div class="window-header">
+                <div class="window-title">Mail.app</div>
+                <div class="window-buttons">
+                    <div class="window-button" onclick="closeWindow('contact-window')">×</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <form class="contact-form" onsubmit="handleSubmit(event)">
+                    <div class="form-group">
+                        <label class="form-label">Nom</label>
+                        <input type="text" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-textarea" required></textarea>
+                    </div>
+                    <button type="submit" class="form-button">Envoyer</button>
+                </form>
+                <div class="contact-info">
+                    <strong>Autres moyens de contact :</strong>
+                    <a href="mailto:matheo.lenoir@example.com" class="contact-link">📧 matheo.lenoir@example.com</a>
+                    <a href="#" class="contact-link">💼 LinkedIn</a>
+                    <a href="#" class="contact-link">💻 GitHub</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easter Egg Window -->
+        <div id="easter-egg-window" class="window">
+            <div class="window-header">
+                <div class="window-title">About System Lux 1.0</div>
+                <div class="window-buttons">
+                    <div class="window-button" onclick="closeWindow('easter-egg-window')">×</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="easter-content">
+                    <img src="/img/mac-logo.png" alt="Macintosh" style="width: 80px; height: 80px; margin: 0 auto 16px; display: block; image-rendering: pixelated;">
+                    <h2>System Lux 1.0</h2>
+                    <p style="margin: 16px 0;">Portfolio vintage édition</p>
+                    <div class="system-info">
+                        System Version: 1.0<br>
+                        Designer: Mathéo Lenoir<br>
+                        Memory: ∞ creativity<br>
+                        Processor: Innovation Core™<br>
+                        Build: 2025.10.12<br>
+                        <br>
+                        © 2025 Mathéo Lenoir<br>
+                        All rights reserved.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Detail Window -->
+        <div id="project-detail-window" class="window">
+            <div class="window-header">
+                <div class="window-title" id="project-detail-title">Project Details</div>
+                <div class="window-buttons">
+                    <div class="window-button" onclick="closeWindow('project-detail-window')">×</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <!-- Carousel -->
+                <div class="carousel-container">
+                    <button class="carousel-button carousel-prev" onclick="changeSlide(-1)">◄</button>
+                    <div class="carousel-images" id="carousel-images">
+                        <!-- Images will be inserted here dynamically -->
+                    </div>
+                    <button class="carousel-button carousel-next" onclick="changeSlide(1)">►</button>
+                </div>
+                <div class="carousel-dots" id="carousel-dots"></div>
+
+                <!-- Project Info -->
+                <div class="project-detail-info">
+                    <h3 id="project-detail-name">Nom du Projet</h3>
+                    <p id="project-detail-description">Description complète du projet...</p>
+                    
+                    <!-- Technologies Used -->
+                    <div class="tech-stack">
+                        <strong>Technologies utilisées :</strong>
+                        <div class="tech-icons" id="tech-icons">
+                            <!-- Icons will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Download Button -->
+                    <div class="project-actions">
+                        <button class="download-button" id="download-button">
+                            <span style="margin-right: 8px;">💾</span>
+                            Télécharger le projet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/Script.js"></script>
+</body>
+</html>
