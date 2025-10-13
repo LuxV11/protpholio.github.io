@@ -46,14 +46,14 @@ const projectsData = {
 
 // Technology logos mapping
 const techLogos = {
-    html: { src: 'images/tech/html.png', label: 'HTML5' },
-    css: { src: 'images/tech/css.png', label: 'CSS3' },
-    javascript: { src: 'images/tech/javascript.png', label: 'JavaScript' },
-    python: { src: 'images/tech/python.png', label: 'Python' },
-    cpp: { src: 'images/tech/cpp.png', label: 'C++' },
-    php: { src: 'images/tech/php.png', label: 'PHP' },
-    mysql: { src: 'images/tech/mysql.png', label: 'MySQL' },
-    arduino: { src: 'images/tech/arduino.png', label: 'Arduino' }
+    html: { src: 'html.png', label: 'HTML5' },
+    css: { src: 'css.png', label: 'CSS3' },
+    javascript: { src: 'javascript.png', label: 'JavaScript' },
+    python: { src: 'python.png', label: 'Python' },
+    cpp: { src: 'cpp.png', label: 'C++' },
+    php: { src: 'php.png', label: 'PHP' },
+    mysql: { src: 'mysql.png', label: 'MySQL' },
+    arduino: { src: 'arduino.png', label: 'Arduino' }
 };
 
 // Carousel state
