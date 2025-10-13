@@ -12,14 +12,14 @@ const projectsData = {
         downloadLink: "files/projet1.zip"
     },
     project2: {
-        title: "Mini-Jeu Python Retro",
-        description: "Jeu vidéo arcade développé avec Pygame, inspiré des classiques 8-bit des années 80. Inclut un système de score, plusieurs niveaux de difficulté et des animations pixel art.",
+        title: "Mini-Jeu Python",
+        description: "Mini jeux de roulette come au casion ",
         images: [
             "images/projects/project2-1.png",
             "images/projects/project2-2.png"
         ],
         technologies: ['python'],
-        downloadLink: "files/projet2.zip"
+        downloadLink: "Roulette.py"
     },
     project3: {
         title: "Site Web Associatif",
