@@ -18,8 +18,8 @@ const projectsData = {
         title: "Roulette Python",
         description: "Un mini-jeu de roulette développé en Python. Le joueur mise et tente sa chance sur un nombre ou une couleur.",
         images: [
-            "images/projects/project2-1.png",
-            "images/projects/project2-2.png"
+            "project2-1.png",
+            "project2-2.png"
         ],
         technologies: ["python"],
         // lien GitHub (blob) — sera converti automatiquement en RAW
