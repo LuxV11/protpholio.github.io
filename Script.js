@@ -18,11 +18,10 @@ const projectsData = {
         title: "Roulette Python",
         description: "Un mini-jeu de roulette développé en Python. Le joueur mise et tente sa chance sur un nombre ou une couleur.",
         images: [
-            "project2-1.png",
-            "project2-2.png"
+            "images/projects/project2-1.png",
+            "images/projects/project2-2.png"
         ],
         technologies: ["python"],
-        // lien GitHub (blob) — sera converti automatiquement en RAW
         downloadLink: "https://github.com/LuxV11/protpholio.github.io/blob/main/Roulette.py"
     },
 
@@ -58,12 +57,383 @@ let currentProject = null;
 
 
 // ==============================
+// === SNAKE GAME ===
+// ==============================
+let snakeCanvas, snakeCtx;
+let snakeGame = {
+    snake: [{x: 10, y: 10}],
+    food: {x: 15, y: 15},
+    dx: 0,
+    dy: 0,
+    score: 0,
+    highScore: 0,
+    gameLoop: null,
+    isRunning: false,
+    isPaused: false,
+    gridSize: 20,
+    tileCount: 20
+};
+
+function initSnakeGame() {
+    snakeCanvas = document.getElementById('snake-canvas');
+    if (!snakeCanvas) return;
+    
+    snakeCtx = snakeCanvas.getContext('2d');
+    
+    // CORRECTION: Utilisation de stockage en mémoire au lieu de localStorage
+    // Pour restaurer localStorage, décommentez les lignes suivantes:
+    /*
+    const savedHighScore = localStorage.getItem('snakeHighScore');
+    if (savedHighScore) {
+        snakeGame.highScore = parseInt(savedHighScore);
+        document.getElementById('snake-high-score').textContent = snakeGame.highScore;
+    }
+    */
+    
+    // Keyboard controls
+    document.addEventListener('keydown', changeSnakeDirection);
+}
+
+function changeSnakeDirection(e) {
+    if (!snakeGame.isRunning || snakeGame.isPaused) return;
+    
+    const key = e.key;
+    const goingUp = snakeGame.dy === -1;
+    const goingDown = snakeGame.dy === 1;
+    const goingRight = snakeGame.dx === 1;
+    const goingLeft = snakeGame.dx === -1;
+    
+    if ((key === 'ArrowLeft' || key === 'Left') && !goingRight) {
+        snakeGame.dx = -1;
+        snakeGame.dy = 0;
+    }
+    if ((key === 'ArrowUp' || key === 'Up') && !goingDown) {
+        snakeGame.dx = 0;
+        snakeGame.dy = -1;
+    }
+    if ((key === 'ArrowRight' || key === 'Right') && !goingLeft) {
+        snakeGame.dx = 1;
+        snakeGame.dy = 0;
+    }
+    if ((key === 'ArrowDown' || key === 'Down') && !goingUp) {
+        snakeGame.dx = 0;
+        snakeGame.dy = 1;
+    }
+}
+
+function startSnakeGame() {
+    if (snakeGame.isRunning && !snakeGame.isPaused) return;
+    
+    // Ne pas réinitialiser si on reprend après une pause
+    if (!snakeGame.isRunning) {
+        // Réinitialiser complètement le jeu
+        snakeGame.snake = [{x: 10, y: 10}];
+        snakeGame.food = {x: 15, y: 15};
+        snakeGame.dx = 0;
+        snakeGame.dy = 0;
+        snakeGame.score = 0;
+        
+        const scoreEl = document.getElementById('snake-score');
+        if (scoreEl) scoreEl.textContent = '0';
+        drawSnakeGame();
+    }
+    
+    snakeGame.isRunning = true;
+    snakeGame.isPaused = false;
+    snakeGame.gameLoop = setInterval(updateSnakeGame, 100);
+}
+
+function pauseSnakeGame() {
+    if (!snakeGame.isRunning) return;
+    
+    snakeGame.isPaused = !snakeGame.isPaused;
+    
+    if (snakeGame.isPaused) {
+        clearInterval(snakeGame.gameLoop);
+    } else {
+        snakeGame.gameLoop = setInterval(updateSnakeGame, 100);
+    }
+}
+
+function resetSnakeGame() {
+    clearInterval(snakeGame.gameLoop);
+    snakeGame.snake = [{x: 10, y: 10}];
+    snakeGame.food = {x: 15, y: 15};
+    snakeGame.dx = 0;
+    snakeGame.dy = 0;
+    snakeGame.score = 0;
+    snakeGame.isRunning = false;
+    snakeGame.isPaused = false;
+    
+    const scoreEl = document.getElementById('snake-score');
+    if (scoreEl) scoreEl.textContent = '0';
+    drawSnakeGame();
+}
+
+function updateSnakeGame() {
+    if (snakeGame.isPaused) return;
+    
+    // Si le serpent n'a pas de direction, ne pas bouger
+    if (snakeGame.dx === 0 && snakeGame.dy === 0) return;
+    
+    // Move snake
+    const head = {x: snakeGame.snake[0].x + snakeGame.dx, y: snakeGame.snake[0].y + snakeGame.dy};
+    
+    // Check wall collision
+    if (head.x < 0 || head.x >= snakeGame.tileCount || head.y < 0 || head.y >= snakeGame.tileCount) {
+        gameOver();
+        return;
+    }
+    
+    // Check self collision
+    for (let i = 0; i < snakeGame.snake.length; i++) {
+        if (head.x === snakeGame.snake[i].x && head.y === snakeGame.snake[i].y) {
+            gameOver();
+            return;
+        }
+    }
+    
+    snakeGame.snake.unshift(head);
+    
+    // Check food collision
+    if (head.x === snakeGame.food.x && head.y === snakeGame.food.y) {
+        snakeGame.score += 10;
+        const scoreEl = document.getElementById('snake-score');
+        if (scoreEl) scoreEl.textContent = snakeGame.score;
+        generateFood();
+        
+        // Update high score
+        if (snakeGame.score > snakeGame.highScore) {
+            snakeGame.highScore = snakeGame.score;
+            const highScoreEl = document.getElementById('snake-high-score');
+            if (highScoreEl) highScoreEl.textContent = snakeGame.highScore;
+            
+            // CORRECTION: Stockage en mémoire (pour localStorage, décommentez)
+            // localStorage.setItem('snakeHighScore', snakeGame.highScore);
+        }
+    } else {
+        snakeGame.snake.pop();
+    }
+    
+    drawSnakeGame();
+}
+
+function generateFood() {
+    snakeGame.food = {
+        x: Math.floor(Math.random() * snakeGame.tileCount),
+        y: Math.floor(Math.random() * snakeGame.tileCount)
+    };
+    
+    // Make sure food doesn't spawn on snake
+    for (let segment of snakeGame.snake) {
+        if (segment.x === snakeGame.food.x && segment.y === snakeGame.food.y) {
+            generateFood();
+            return;
+        }
+    }
+}
+
+function drawSnakeGame() {
+    if (!snakeCtx || !snakeCanvas) return;
+    
+    // Clear canvas
+    snakeCtx.fillStyle = '#e8e8e8';
+    snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+    
+    // Draw grid
+    snakeCtx.strokeStyle = '#d0d0d0';
+    snakeCtx.lineWidth = 1;
+    for (let i = 0; i <= snakeGame.tileCount; i++) {
+        snakeCtx.beginPath();
+        snakeCtx.moveTo(i * snakeGame.gridSize, 0);
+        snakeCtx.lineTo(i * snakeGame.gridSize, snakeCanvas.height);
+        snakeCtx.stroke();
+        
+        snakeCtx.beginPath();
+        snakeCtx.moveTo(0, i * snakeGame.gridSize);
+        snakeCtx.lineTo(snakeCanvas.width, i * snakeGame.gridSize);
+        snakeCtx.stroke();
+    }
+    
+    // Draw snake
+    snakeGame.snake.forEach((segment, index) => {
+        if (index === 0) {
+            snakeCtx.fillStyle = '#000';
+        } else {
+            snakeCtx.fillStyle = '#333';
+        }
+        snakeCtx.fillRect(
+            segment.x * snakeGame.gridSize + 1,
+            segment.y * snakeGame.gridSize + 1,
+            snakeGame.gridSize - 2,
+            snakeGame.gridSize - 2
+        );
+    });
+    
+    // Draw food (apple emoji style)
+    snakeCtx.fillStyle = '#ff0000';
+    snakeCtx.fillRect(
+        snakeGame.food.x * snakeGame.gridSize + 2,
+        snakeGame.food.y * snakeGame.gridSize + 2,
+        snakeGame.gridSize - 4,
+        snakeGame.gridSize - 4
+    );
+    
+    // Draw leaf on apple
+    snakeCtx.fillStyle = '#00ff00';
+    snakeCtx.fillRect(
+        snakeGame.food.x * snakeGame.gridSize + snakeGame.gridSize / 2,
+        snakeGame.food.y * snakeGame.gridSize + 2,
+        4,
+        4
+    );
+}
+
+function gameOver() {
+    clearInterval(snakeGame.gameLoop);
+    snakeGame.isRunning = false;
+    snakeGame.isPaused = false;
+    
+    if (!snakeCtx || !snakeCanvas) return;
+    
+    snakeCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+    
+    snakeCtx.fillStyle = '#fff';
+    snakeCtx.font = 'bold 24px Arial';
+    snakeCtx.textAlign = 'center';
+    snakeCtx.fillText('GAME OVER', snakeCanvas.width / 2, snakeCanvas.height / 2 - 20);
+    snakeCtx.font = '16px Arial';
+    snakeCtx.fillText('Score: ' + snakeGame.score, snakeCanvas.width / 2, snakeCanvas.height / 2 + 20);
+    snakeCtx.fillText('Appuyez sur Démarrer pour rejouer', snakeCanvas.width / 2, snakeCanvas.height / 2 + 50);
+}
+
+
+// ==============================
+// === CONTACT FORM (EmailJS) ===
+// ==============================
+function handleSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const statusDiv = document.getElementById('contact-status');
+    const submitBtn = form.querySelector('.form-button');
+    
+    if (!submitBtn) return;
+    
+    // Get form data
+    const nameInput = form.querySelector('input[type="text"]');
+    const emailInput = form.querySelector('input[type="email"]');
+    const messageInput = form.querySelector('textarea');
+    
+    if (!nameInput || !emailInput || !messageInput) {
+        showContactStatus('Erreur: formulaire incomplet', 'error');
+        return;
+    }
+    
+    const formData = {
+        name: nameInput.value,
+        email: emailInput.value,
+        message: messageInput.value
+    };
+    
+    // Disable button during send
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Envoi...';
+    
+    // OPTION 1: EmailJS (gratuit, simple)
+    // Inscription sur https://www.emailjs.com/
+    // Remplace ces IDs par les tiens
+    /*
+    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
+        .then(function() {
+            showContactStatus('Message envoyé avec succès ! ✅', 'success');
+            form.reset();
+        }, function(error) {
+            showContactStatus('Erreur lors de l\'envoi. Réessayez.', 'error');
+            console.error('EmailJS Error:', error);
+        })
+        .finally(function() {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Envoyer';
+        });
+    */
+    
+    // OPTION 2: Formspree (gratuit, sans code backend)
+    // Inscription sur https://formspree.io/
+    // Remplace FORM_ID par ton ID
+    /*
+    fetch('https://formspree.io/f/YOUR_FORM_ID', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (response.ok) {
+            showContactStatus('Message envoyé avec succès ! ✅', 'success');
+            form.reset();
+        } else {
+            showContactStatus('Erreur lors de l\'envoi. Réessayez.', 'error');
+        }
+    })
+    .catch(error => {
+        showContactStatus('Erreur réseau. Vérifiez votre connexion.', 'error');
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Envoyer';
+    });
+    */
+    
+    // OPTION 3: Simulation (pour test local)
+    setTimeout(() => {
+        showContactStatus(`Message reçu de ${formData.name} ! ✅ (Mode simulation)`, 'success');
+        form.reset();
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Envoyer';
+    }, 1000);
+}
+
+function showContactStatus(message, type) {
+    let statusDiv = document.getElementById('contact-status');
+    
+    if (!statusDiv) {
+        statusDiv = document.createElement('div');
+        statusDiv.id = 'contact-status';
+        statusDiv.className = 'contact-form-status';
+        const contactForm = document.querySelector('.contact-form');
+        if (contactForm) {
+            contactForm.appendChild(statusDiv);
+        }
+    }
+    
+    statusDiv.textContent = message;
+    statusDiv.className = 'contact-form-status ' + type;
+    
+    setTimeout(() => {
+        statusDiv.className = 'contact-form-status';
+    }, 5000);
+}
+
+
+// ==============================
 // === FONCTIONS WINDOWS (OPEN/CLOSE/TOGGLE) ===
 // ==============================
 function toggleWindow(windowId) {
     const win = document.getElementById(windowId);
     if (!win) return;
     win.classList.toggle('active');
+    
+    // Initialize snake game when window opens
+    if (windowId === 'snake-window' && win.classList.contains('active')) {
+        if (!snakeCtx) {
+            initSnakeGame();
+            drawSnakeGame();
+        }
+    }
 }
 
 function openWindow(windowId) {
@@ -76,6 +446,11 @@ function closeWindow(windowId) {
     const win = document.getElementById(windowId);
     if (!win) return;
     win.classList.remove('active');
+    
+    // Pause snake game when closing window
+    if (windowId === 'snake-window' && snakeGame.isRunning) {
+        pauseSnakeGame();
+    }
 }
 
 
@@ -92,7 +467,6 @@ function openProjectDetail(projectId) {
     currentProject = project;
     currentSlide = 0;
 
-    // Titres & description
     const titleEl = document.getElementById('project-detail-title');
     const nameEl = document.getElementById('project-detail-name');
     const descEl = document.getElementById('project-detail-description');
@@ -101,7 +475,6 @@ function openProjectDetail(projectId) {
     if (nameEl) nameEl.textContent = project.title;
     if (descEl) descEl.textContent = project.description;
 
-    // --- Carousel d'images ---
     const carouselContainer = document.getElementById('carousel-images');
     if (carouselContainer) {
         carouselContainer.innerHTML = '';
@@ -121,7 +494,6 @@ function openProjectDetail(projectId) {
         });
     }
 
-    // --- Dots ---
     const dotsContainer = document.getElementById('carousel-dots');
     if (dotsContainer) {
         dotsContainer.innerHTML = '';
@@ -133,7 +505,6 @@ function openProjectDetail(projectId) {
         });
     }
 
-    // --- Technologies ---
     const techContainer = document.getElementById('tech-icons');
     if (techContainer) {
         techContainer.innerHTML = '';
@@ -161,7 +532,6 @@ function openProjectDetail(projectId) {
                 icon.appendChild(imgWrap);
                 icon.appendChild(label);
             } else {
-                // Fallback si pas d'icône
                 icon.innerHTML = '<div style="font-size:14px;padding:6px;">' + t + '</div>';
             }
 
@@ -169,10 +539,8 @@ function openProjectDetail(projectId) {
         });
     }
 
-    // --- Bouton téléchargement dans la fenêtre détail ---
     const downloadBtn = document.getElementById('download-button');
     if (downloadBtn) {
-        // on remplace l'ancien onclick par la nouvelle logique
         downloadBtn.onclick = async function() {
             if (!currentProject || !currentProject.downloadLink) {
                 alert("Aucun lien de téléchargement défini pour ce projet.");
@@ -181,14 +549,12 @@ function openProjectDetail(projectId) {
 
             let downloadURL = currentProject.downloadLink;
 
-            // Convertit github.com/.../blob/... -> raw.githubusercontent.com/...
             if (downloadURL.includes("github.com") && downloadURL.includes("/blob/")) {
                 downloadURL = downloadURL
                     .replace("github.com", "raw.githubusercontent.com")
                     .replace("/blob/", "/");
             }
 
-            // Support github:User/Repo -> télécharge le zip du main
             if (downloadURL.startsWith("github:")) {
                 const repo = downloadURL.replace("github:", "");
                 downloadURL = `https://github.com/${repo}/archive/refs/heads/main.zip`;
@@ -199,14 +565,11 @@ function openProjectDetail(projectId) {
                 if (!response.ok) throw new Error("Impossible de télécharger le fichier.");
                 const blob = await response.blob();
 
-                // Crée un objectURL et force le téléchargement
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
 
-                // Nom du fichier : on récupère la dernière partie de l'URL (fallback simple)
                 let fileName = downloadURL.split('/').pop() || 'download';
-                // Si query string présente -> on enlève
                 fileName = fileName.split('?')[0];
 
                 a.download = fileName;
@@ -214,16 +577,12 @@ function openProjectDetail(projectId) {
                 a.click();
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
-
-                // Optionnel : message
-                // alert(`Téléchargement de ${fileName} terminé ✅`);
             } catch (err) {
                 alert("Erreur pendant le téléchargement : " + err.message);
             }
         };
     }
 
-    // Ouvre la fenêtre de détail
     openWindow('project-detail-window');
 }
 
@@ -278,9 +637,7 @@ function enableDraggableWindows() {
     });
 
     function startDrag(e) {
-        // Désactive sur mobile
         if (window.innerWidth < 768) return;
-        // Si on clique sur un bouton de la barre, n'initie pas le drag
         if (e.target.classList.contains('window-button')) return;
 
         draggedWindow = e.target.closest('.window');
@@ -303,7 +660,6 @@ function enableDraggableWindows() {
             const newX = e.clientX - offsetX;
             const newY = e.clientY - offsetY;
 
-            // Garder la fenêtre dans l'écran
             const maxX = window.innerWidth - draggedWindow.offsetWidth;
             const maxY = window.innerHeight - draggedWindow.offsetHeight;
 
@@ -319,7 +675,6 @@ function enableDraggableWindows() {
         document.removeEventListener('mouseup', stopDrag);
     }
 
-    // Reset positions on resize for small screens
     let resizeTimer;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimer);
@@ -340,19 +695,18 @@ function enableDraggableWindows() {
 // === INIT : DOMContentLoaded ===
 // ==============================
 document.addEventListener('DOMContentLoaded', function() {
-    // Attache les boutons de projet (éléments avec data-project)
+    // CORRECTION: Gestionnaire pour les boutons de projets
     document.querySelectorAll('.project-button').forEach(btn => {
         const projectKey = btn.getAttribute('data-project');
         if (!projectKey) return;
         btn.addEventListener('click', function() {
             openProjectDetail(projectKey);
-            // effet visuel: active sur bouton
             document.querySelectorAll('.project-button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
     });
 
-    // Boutons de fermeture pour toutes les fenêtres (class .window-close)
+    // CORRECTION: Gestionnaire pour les boutons de fermeture
     document.querySelectorAll('.window-close').forEach(btn => {
         btn.addEventListener('click', function() {
             const win = btn.closest('.window');
@@ -360,28 +714,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Boutons prev/next du carrousel (si présents)
+    // CORRECTION: Gestionnaire pour les boutons de carrousel
     const prevBtn = document.getElementById('carousel-prev');
     const nextBtn = document.getElementById('carousel-next');
     if (prevBtn) prevBtn.addEventListener('click', () => changeSlide(-1));
     if (nextBtn) nextBtn.addEventListener('click', () => changeSlide(1));
 
-    // Formulaire de contact si présent (id="contact-form")
-    const contactForm = document.getElementById('contact-form');
-    if (contactForm) contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Message envoyé ! (Simulation - intégrez votre backend ici)');
-        contactForm.reset();
-    });
-
-    // Boot screen hide after animation (id="boot-screen")
-    setTimeout(function() {
-        const bootScreen = document.getElementById('boot-screen');
-        if (bootScreen) bootScreen.style.display = 'none';
-    }, 3000);
-
-    // Active draggable windows
+    // CORRECTION: Initialisation des fenêtres déplaçables
     enableDraggableWindows();
 
-    console.log('Script chargé : windows, projets, carrousel et téléchargement OK ✅');
+    // CORRECTION: Gestionnaire pour le formulaire de contact
+    const contactForm = document.querySelector('.contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', handleSubmit);
+    }
 });
