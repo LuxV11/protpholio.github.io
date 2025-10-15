@@ -387,35 +387,7 @@ function handleSubmit(e) {
     });
     */
     
-    // OPTION 3: Simulation (pour test local)
-    setTimeout(() => {
-        showContactStatus(`Message reçu de ${formData.name} ! ✅ (Mode simulation)`, 'success');
-        form.reset();
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Envoyer';
-    }, 1000);
-}
-
-function showContactStatus(message, type) {
-    let statusDiv = document.getElementById('contact-status');
     
-    if (!statusDiv) {
-        statusDiv = document.createElement('div');
-        statusDiv.id = 'contact-status';
-        statusDiv.className = 'contact-form-status';
-        const contactForm = document.querySelector('.contact-form');
-        if (contactForm) {
-            contactForm.appendChild(statusDiv);
-        }
-    }
-    
-    statusDiv.textContent = message;
-    statusDiv.className = 'contact-form-status ' + type;
-    
-    setTimeout(() => {
-        statusDiv.className = 'contact-form-status';
-    }, 5000);
-}
 
 
 // ==============================
