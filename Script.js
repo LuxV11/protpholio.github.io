@@ -18,8 +18,8 @@ const projectsData = {
         title: "Roulette Python",
         description: "Un mini-jeu de roulette développé en Python. Le joueur mise et tente sa chance sur un nombre ou une couleur.",
         images: [
-            "images/projects/project2-1.png",
-            "images/projects/project2-2.png"
+            "project2-1.png",
+            "project2-2.png"
         ],
         technologies: ["python"],
         downloadLink: "https://github.com/LuxV11/protpholio.github.io/blob/main/Roulette.py"
@@ -38,14 +38,14 @@ const projectsData = {
 };
 
 const techLogos = {
-    html: { src: 'images/tech/html.png', label: 'HTML5' },
-    css: { src: 'images/tech/css.png', label: 'CSS3' },
-    javascript: { src: 'images/tech/javascript.png', label: 'JavaScript' },
-    python: { src: 'images/tech/python.png', label: 'Python' },
-    php: { src: 'images/tech/php.png', label: 'PHP' },
-    mysql: { src: 'images/tech/mysql.png', label: 'MySQL' },
-    cpp: { src: 'images/tech/cpp.png', label: 'C++' },
-    arduino: { src: 'images/tech/arduino.png', label: 'Arduino' }
+    html: { src: 'html.png', label: 'HTML5' },
+    css: { src: 'css.png', label: 'CSS3' },
+    javascript: { src: 'javascript.png', label: 'JavaScript' },
+    python: { src: 'python.png', label: 'Python' },
+    php: { src: 'php.png', label: 'PHP' },
+    mysql: { src: 'mysql.png', label: 'MySQL' },
+    cpp: { src: 'cpp.png', label: 'C++' },
+    arduino: { src: 'arduino.png', label: 'Arduino' }
 };
 
 
