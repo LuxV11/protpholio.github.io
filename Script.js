@@ -344,8 +344,8 @@ function handleSubmit(e) {
     // OPTION 1: EmailJS (gratuit, simple)
     // Inscription sur https://www.emailjs.com/
     // Remplace ces IDs par les tiens
-    /*
-    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
+   
+    emailjs.send('service_rht8m2p', 'template_qdwy3jo', formData)
         .then(function() {
             showContactStatus('Message envoyé avec succès ! ✅', 'success');
             form.reset();
@@ -357,7 +357,7 @@ function handleSubmit(e) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Envoyer';
         });
-    */
+   
     
     // OPTION 2: Formspree (gratuit, sans code backend)
     // Inscription sur https://formspree.io/
