@@ -18,10 +18,13 @@ const projectsData = {
         title: "Roulette Python",
         description: "Un mini-jeu de roulette développé en Python. Le joueur mise et tente sa chance sur un nombre ou une couleur.",
         images: [
+            "project2-1.png",
+            "project2-2.png"
             "images/projects/project2-1.png",
             "images/projects/project2-2.png"
         ],
         technologies: ["python"],
+        // lien GitHub (blob) — sera converti automatiquement en RAW
         downloadLink: "https://github.com/LuxV11/protpholio.github.io/blob/main/Roulette.py"
     },
 
@@ -344,8 +347,8 @@ function handleSubmit(e) {
     // OPTION 1: EmailJS (gratuit, simple)
     // Inscription sur https://www.emailjs.com/
     // Remplace ces IDs par les tiens
-   
-    emailjs.send('service_rht8m2p', 'template_qdwy3jo', formData)
+    /*
+    emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', formData)
         .then(function() {
             showContactStatus('Message envoyé avec succès ! ✅', 'success');
             form.reset();
@@ -357,7 +360,7 @@ function handleSubmit(e) {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Envoyer';
         });
-   
+    */
     
     // OPTION 2: Formspree (gratuit, sans code backend)
     // Inscription sur https://formspree.io/
@@ -389,7 +392,6 @@ function handleSubmit(e) {
     */
     
     // OPTION 3: Simulation (pour test local)
-   /*
     setTimeout(() => {
         showContactStatus(`Message reçu de ${formData.name} ! ✅ (Mode simulation)`, 'success');
         form.reset();
@@ -419,7 +421,7 @@ function showContactStatus(message, type) {
     }, 5000);
 }
 
-*/
+
 // ==============================
 // === FONCTIONS WINDOWS (OPEN/CLOSE/TOGGLE) ===
 // ==============================
@@ -468,6 +470,7 @@ function openProjectDetail(projectId) {
     currentProject = project;
     currentSlide = 0;
 
+    // Titres & description
     const titleEl = document.getElementById('project-detail-title');
     const nameEl = document.getElementById('project-detail-name');
     const descEl = document.getElementById('project-detail-description');
@@ -476,6 +479,7 @@ function openProjectDetail(projectId) {
     if (nameEl) nameEl.textContent = project.title;
     if (descEl) descEl.textContent = project.description;
 
+    // --- Carousel d'images ---
     const carouselContainer = document.getElementById('carousel-images');
     if (carouselContainer) {
         carouselContainer.innerHTML = '';
@@ -495,6 +499,7 @@ function openProjectDetail(projectId) {
         });
     }
 
+    // --- Dots ---
     const dotsContainer = document.getElementById('carousel-dots');
     if (dotsContainer) {
         dotsContainer.innerHTML = '';
@@ -506,6 +511,7 @@ function openProjectDetail(projectId) {
         });
     }
 
+    // --- Technologies ---
     const techContainer = document.getElementById('tech-icons');
     if (techContainer) {
         techContainer.innerHTML = '';
@@ -533,6 +539,7 @@ function openProjectDetail(projectId) {
                 icon.appendChild(imgWrap);
                 icon.appendChild(label);
             } else {
+                // Fallback si pas d'icône
                 icon.innerHTML = '<div style="font-size:14px;padding:6px;">' + t + '</div>';
             }
 
@@ -540,8 +547,10 @@ function openProjectDetail(projectId) {
         });
     }
 
+    // --- Bouton téléchargement dans la fenêtre détail ---
     const downloadBtn = document.getElementById('download-button');
     if (downloadBtn) {
+        // on remplace l'ancien onclick par la nouvelle logique
         downloadBtn.onclick = async function() {
             if (!currentProject || !currentProject.downloadLink) {
                 alert("Aucun lien de téléchargement défini pour ce projet.");
@@ -550,12 +559,14 @@ function openProjectDetail(projectId) {
 
             let downloadURL = currentProject.downloadLink;
 
+            // Convertit github.com/.../blob/... -> raw.githubusercontent.com/...
             if (downloadURL.includes("github.com") && downloadURL.includes("/blob/")) {
                 downloadURL = downloadURL
                     .replace("github.com", "raw.githubusercontent.com")
                     .replace("/blob/", "/");
             }
 
+            // Support github:User/Repo -> télécharge le zip du main
             if (downloadURL.startsWith("github:")) {
                 const repo = downloadURL.replace("github:", "");
                 downloadURL = `https://github.com/${repo}/archive/refs/heads/main.zip`;
@@ -566,11 +577,14 @@ function openProjectDetail(projectId) {
                 if (!response.ok) throw new Error("Impossible de télécharger le fichier.");
                 const blob = await response.blob();
 
+                // Crée un objectURL et force le téléchargement
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
 
+                // Nom du fichier : on récupère la dernière partie de l'URL (fallback simple)
                 let fileName = downloadURL.split('/').pop() || 'download';
+                // Si query string présente -> on enlève
                 fileName = fileName.split('?')[0];
 
                 a.download = fileName;
@@ -578,12 +592,16 @@ function openProjectDetail(projectId) {
                 a.click();
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
+
+                // Optionnel : message
+                // alert(`Téléchargement de ${fileName} terminé ✅`);
             } catch (err) {
                 alert("Erreur pendant le téléchargement : " + err.message);
             }
         };
     }
 
+    // Ouvre la fenêtre de détail
     openWindow('project-detail-window');
 }
 
@@ -638,7 +656,9 @@ function enableDraggableWindows() {
     });
 
     function startDrag(e) {
+        // Désactive sur mobile
         if (window.innerWidth < 768) return;
+        // Si on clique sur un bouton de la barre, n'initie pas le drag
         if (e.target.classList.contains('window-button')) return;
 
         draggedWindow = e.target.closest('.window');
@@ -661,6 +681,7 @@ function enableDraggableWindows() {
             const newX = e.clientX - offsetX;
             const newY = e.clientY - offsetY;
 
+            // Garder la fenêtre dans l'écran
             const maxX = window.innerWidth - draggedWindow.offsetWidth;
             const maxY = window.innerHeight - draggedWindow.offsetHeight;
 
@@ -676,6 +697,7 @@ function enableDraggableWindows() {
         document.removeEventListener('mouseup', stopDrag);
     }
 
+    // Reset positions on resize for small screens
     let resizeTimer;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimer);
@@ -696,17 +718,20 @@ function enableDraggableWindows() {
 // === INIT : DOMContentLoaded ===
 // ==============================
 document.addEventListener('DOMContentLoaded', function() {
+    // Attache les boutons de projet (éléments avec data-project)
     // CORRECTION: Gestionnaire pour les boutons de projets
     document.querySelectorAll('.project-button').forEach(btn => {
         const projectKey = btn.getAttribute('data-project');
         if (!projectKey) return;
         btn.addEventListener('click', function() {
             openProjectDetail(projectKey);
+            // effet visuel: active sur bouton
             document.querySelectorAll('.project-button').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
     });
 
+    // Boutons de fermeture pour toutes les fenêtres (class .window-close)
     // CORRECTION: Gestionnaire pour les boutons de fermeture
     document.querySelectorAll('.window-close').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -715,15 +740,32 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Boutons prev/next du carrousel (si présents)
     // CORRECTION: Gestionnaire pour les boutons de carrousel
     const prevBtn = document.getElementById('carousel-prev');
     const nextBtn = document.getElementById('carousel-next');
     if (prevBtn) prevBtn.addEventListener('click', () => changeSlide(-1));
     if (nextBtn) nextBtn.addEventListener('click', () => changeSlide(1));
 
+    // Formulaire de contact si présent (id="contact-form")
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Message envoyé ! (Simulation - intégrez votre backend ici)');
+        contactForm.reset();
+    });
+
+    // Boot screen hide after animation (id="boot-screen")
+    setTimeout(function() {
+        const bootScreen = document.getElementById('boot-screen');
+        if (bootScreen) bootScreen.style.display = 'none';
+    }, 3000);
+
+    // Active draggable windows
     // CORRECTION: Initialisation des fenêtres déplaçables
     enableDraggableWindows();
 
+    console.log('Script chargé : windows, projets, carrousel et téléchargement OK ✅');
     // CORRECTION: Gestionnaire pour le formulaire de contact
     const contactForm = document.querySelector('.contact-form');
     if (contactForm) {
