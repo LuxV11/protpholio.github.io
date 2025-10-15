@@ -339,30 +339,13 @@ function handleSubmit(e) {
     
     // Disable button during send
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Envoi...';
-    
-    // OPTION 1: EmailJS (gratuit, simple)
-    // Inscription sur https://www.emailjs.com/
-    // Remplace ces IDs par les tiens
-    
-    emailjs.send('service_rht8m2p', 'template_qdwy3jo', formData)
-        .then(function() {
-            showContactStatus('Message envoyé avec succès ! ✅', 'success');
-            form.reset();
-        }, function(error) {
-            showContactStatus('Erreur lors de l\'envoi. Réessayez.', 'error');
-            console.error('EmailJS Error:', error);
-        })
-        .finally(function() {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Envoyer';
-        });
+    submitBtn.textContent = 'Envoi...'
     
     // OPTION 2: Formspree (gratuit, sans code backend)
     // Inscription sur https://formspree.io/
     // Remplace FORM_ID par ton ID
-    /*
-    fetch('https://formspree.io/f/YOUR_FORM_ID', {
+    
+    fetch('https://formspree.io/f/xgvnrzvr', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -385,7 +368,7 @@ function handleSubmit(e) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Envoyer';
     });
-    */
+    
     
     
 
