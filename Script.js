@@ -389,6 +389,7 @@ function handleSubmit(e) {
     */
     
     // OPTION 3: Simulation (pour test local)
+   /*
     setTimeout(() => {
         showContactStatus(`Message reçu de ${formData.name} ! ✅ (Mode simulation)`, 'success');
         form.reset();
@@ -418,7 +419,7 @@ function showContactStatus(message, type) {
     }, 5000);
 }
 
-
+*/
 // ==============================
 // === FONCTIONS WINDOWS (OPEN/CLOSE/TOGGLE) ===
 // ==============================
