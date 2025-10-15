@@ -362,6 +362,11 @@ body {
     color: #fff;
 }
 
+.form-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .contact-info {
     margin-top: 20px;
     padding: 16px;
@@ -374,6 +379,97 @@ body {
     margin: 8px 0;
     color: #000;
     text-decoration: underline;
+}
+
+.contact-form-status {
+    margin-top: 12px;
+    padding: 12px;
+    border: 2px solid #000;
+    background: #f0f0f0;
+    text-align: center;
+    font-weight: bold;
+    display: none;
+}
+
+.contact-form-status.success {
+    display: block;
+    background: #90EE90;
+}
+
+.contact-form-status.error {
+    display: block;
+    background: #FFB6C6;
+}
+
+/* Snake Game Window */
+#snake-window {
+    top: 100px;
+    left: 300px;
+    width: 480px;
+    max-width: 90vw;
+}
+
+.snake-game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.game-info {
+    display: flex;
+    gap: 32px;
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+    background: #f0f0f0;
+    border: 2px solid #000;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#snake-canvas {
+    border: 3px solid #000;
+    background: #e8e8e8;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.game-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.game-button {
+    padding: 10px 20px;
+    border: 2px solid #000;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.game-button:hover {
+    background: #000;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.game-button:active {
+    transform: translateY(0);
+}
+
+.game-instructions {
+    text-align: center;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #000;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
 /* Easter Egg Window */
@@ -613,6 +709,7 @@ body {
     .menu-bar {
         font-size: 12px;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .profile-name {
@@ -626,6 +723,16 @@ body {
     .tech-icons {
         justify-content: center;
     }
+
+    #snake-canvas {
+        width: 100%;
+        height: auto;
+    }
+
+    .game-info {
+        font-size: 14px;
+        gap: 16px;
+    }
 }
 
 @media (min-width: 769px) {
@@ -636,9 +743,4 @@ body {
     .window-header {
         cursor: move;
     }
-}
-
-/* Cursor */
-.clickable {
-    cursor: pointer;
 }
