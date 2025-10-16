@@ -57,7 +57,7 @@ let currentProject = null;
 
 
 // ==============================
-// === SNAKE GAME ===
+// === SNAKE GAME + LEADERBOARD ===
 // ==============================
 let snakeCanvas, snakeCtx;
 let snakeGame = {
@@ -74,21 +74,213 @@ let snakeGame = {
     tileCount: 20
 };
 
+// LEADERBOARD - Stockage dans localStorage
+function getLeaderboard() {
+    const data = localStorage.getItem('snakeLeaderboard');
+    return data ? JSON.parse(data) : [];
+}
+
+function saveLeaderboard(leaderboard) {
+    localStorage.setItem('snakeLeaderboard', JSON.stringify(leaderboard));
+}
+
+function addScoreToLeaderboard(playerName, score) {
+    const leaderboard = getLeaderboard();
+    
+    const newEntry = {
+        name: playerName,
+        score: score,
+        date: new Date().toISOString()
+    };
+    
+    leaderboard.push(newEntry);
+    
+    // Trier par score décroissant
+    leaderboard.sort((a, b) => b.score - a.score);
+    
+    // Garder seulement le top 10
+    const top10 = leaderboard.slice(0, 10);
+    
+    saveLeaderboard(top10);
+    displayLeaderboard();
+    
+    // Retourner le rang du joueur
+    const rank = top10.findIndex(entry => 
+        entry.name === playerName && 
+        entry.score === score && 
+        entry.date === newEntry.date
+    ) + 1;
+    
+    return rank;
+}
+
+function displayLeaderboard() {
+    const leaderboard = getLeaderboard();
+    const listEl = document.getElementById('leaderboard-list');
+    
+    if (!listEl) return;
+    
+    if (leaderboard.length === 0) {
+        listEl.innerHTML = '<div class="leaderboard-empty">Aucun score enregistré.<br>Soyez le premier à jouer !</div>';
+        return;
+    }
+    
+    listEl.innerHTML = '';
+    
+    leaderboard.forEach((entry, index) => {
+        const item = document.createElement('div');
+        item.className = 'leaderboard-item';
+        
+        const rank = index + 1;
+        let rankClass = '';
+        let rankIcon = `#${rank}`;
+        
+        if (rank === 1) {
+            rankClass = 'gold';
+            rankIcon = '🥇';
+        } else if (rank === 2) {
+            rankClass = 'silver';
+            rankIcon = '🥈';
+        } else if (rank === 3) {
+            rankClass = 'bronze';
+            rankIcon = '🥉';
+        }
+        
+        const date = new Date(entry.date);
+        const dateStr = date.toLocaleDateString('fr-FR', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric'
+        });
+        
+        item.innerHTML = `
+            <span class="leaderboard-rank ${rankClass}">${rankIcon}</span>
+            <span class="leaderboard-player">${escapeHtml(entry.name)}</span>
+            <span class="leaderboard-score">${entry.score} pts</span>
+            <span class="leaderboard-date">${dateStr}</span>
+        `;
+        
+        listEl.appendChild(item);
+    });
+    
+    // Mettre à jour le high score
+    if (leaderboard.length > 0) {
+        snakeGame.highScore = leaderboard[0].score;
+        const highScoreEl = document.getElementById('snake-high-score');
+        if (highScoreEl) {
+            highScoreEl.textContent = snakeGame.highScore;
+        }
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showPlayerNameModal(score) {
+    // Créer l'overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'player-modal-overlay';
+    
+    // Créer le modal
+    const modal = document.createElement('div');
+    modal.className = 'player-name-modal';
+    modal.innerHTML = `
+        <h3>🎉 Nouveau Score : ${score} points !</h3>
+        <p style="text-align: center; margin-bottom: 12px; color: #666;">
+            Entrez votre nom pour le leaderboard :
+        </p>
+        <input type="text" id="player-name-input" maxlength="20" placeholder="Votre nom" autofocus>
+        <div class="modal-buttons">
+            <button onclick="submitPlayerName()">✅ Valider</button>
+            <button onclick="cancelPlayerName()">❌ Annuler</button>
+        </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(modal);
+    
+    // Focus sur l'input
+    setTimeout(() => {
+        const input = document.getElementById('player-name-input');
+        if (input) {
+            input.focus();
+            // Soumettre avec Enter
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    submitPlayerName();
+                }
+            });
+        }
+    }, 100);
+}
+
+function submitPlayerName() {
+    const input = document.getElementById('player-name-input');
+    const playerName = input ? input.value.trim() : '';
+    
+    if (!playerName) {
+        alert('Veuillez entrer un nom valide !');
+        return;
+    }
+    
+    const score = snakeGame.score;
+    const rank = addScoreToLeaderboard(playerName, score);
+    
+    // Fermer le modal
+    closePlayerModal();
+    
+    // Afficher un message de félicitations
+    if (rank <= 10) {
+        alert(`🎉 Félicitations ${playerName} !\nVous êtes classé #${rank} avec ${score} points !`);
+        
+        // Highlight le score dans le leaderboard
+        setTimeout(() => {
+            highlightLeaderboardEntry(playerName, score);
+        }, 100);
+    }
+}
+
+function cancelPlayerName() {
+    closePlayerModal();
+}
+
+function closePlayerModal() {
+    const overlay = document.getElementById('player-modal-overlay');
+    const modal = document.querySelector('.player-name-modal');
+    
+    if (overlay) overlay.remove();
+    if (modal) modal.remove();
+}
+
+function highlightLeaderboardEntry(playerName, score) {
+    const items = document.querySelectorAll('.leaderboard-item');
+    items.forEach(item => {
+        const nameEl = item.querySelector('.leaderboard-player');
+        const scoreEl = item.querySelector('.leaderboard-score');
+        
+        if (nameEl && scoreEl) {
+            const itemScore = parseInt(scoreEl.textContent);
+            if (nameEl.textContent === playerName && itemScore === score) {
+                item.classList.add('highlight');
+                // Scroller vers l'élément
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+    });
+}
+
 function initSnakeGame() {
     snakeCanvas = document.getElementById('snake-canvas');
     if (!snakeCanvas) return;
     
     snakeCtx = snakeCanvas.getContext('2d');
     
-    // CORRECTION: Utilisation de stockage en mémoire au lieu de localStorage
-    // Pour restaurer localStorage, décommentez les lignes suivantes:
-    /*
-    const savedHighScore = localStorage.getItem('snakeHighScore');
-    if (savedHighScore) {
-        snakeGame.highScore = parseInt(savedHighScore);
-        document.getElementById('snake-high-score').textContent = snakeGame.highScore;
-    }
-    */
+    // Charger et afficher le leaderboard
+    displayLeaderboard();
     
     // Keyboard controls
     document.addEventListener('keydown', changeSnakeDirection);
@@ -124,9 +316,7 @@ function changeSnakeDirection(e) {
 function startSnakeGame() {
     if (snakeGame.isRunning && !snakeGame.isPaused) return;
     
-    // Ne pas réinitialiser si on reprend après une pause
     if (!snakeGame.isRunning) {
-        // Réinitialiser complètement le jeu
         snakeGame.snake = [{x: 10, y: 10}];
         snakeGame.food = {x: 15, y: 15};
         snakeGame.dx = 0;
@@ -173,19 +363,15 @@ function resetSnakeGame() {
 function updateSnakeGame() {
     if (snakeGame.isPaused) return;
     
-    // Si le serpent n'a pas de direction, ne pas bouger
     if (snakeGame.dx === 0 && snakeGame.dy === 0) return;
     
-    // Move snake
     const head = {x: snakeGame.snake[0].x + snakeGame.dx, y: snakeGame.snake[0].y + snakeGame.dy};
     
-    // Check wall collision
     if (head.x < 0 || head.x >= snakeGame.tileCount || head.y < 0 || head.y >= snakeGame.tileCount) {
         gameOver();
         return;
     }
     
-    // Check self collision
     for (let i = 0; i < snakeGame.snake.length; i++) {
         if (head.x === snakeGame.snake[i].x && head.y === snakeGame.snake[i].y) {
             gameOver();
@@ -195,22 +381,11 @@ function updateSnakeGame() {
     
     snakeGame.snake.unshift(head);
     
-    // Check food collision
     if (head.x === snakeGame.food.x && head.y === snakeGame.food.y) {
         snakeGame.score += 10;
         const scoreEl = document.getElementById('snake-score');
         if (scoreEl) scoreEl.textContent = snakeGame.score;
         generateFood();
-        
-        // Update high score
-        if (snakeGame.score > snakeGame.highScore) {
-            snakeGame.highScore = snakeGame.score;
-            const highScoreEl = document.getElementById('snake-high-score');
-            if (highScoreEl) highScoreEl.textContent = snakeGame.highScore;
-            
-            // CORRECTION: Stockage en mémoire (pour localStorage, décommentez)
-            // localStorage.setItem('snakeHighScore', snakeGame.highScore);
-        }
     } else {
         snakeGame.snake.pop();
     }
@@ -224,7 +399,6 @@ function generateFood() {
         y: Math.floor(Math.random() * snakeGame.tileCount)
     };
     
-    // Make sure food doesn't spawn on snake
     for (let segment of snakeGame.snake) {
         if (segment.x === snakeGame.food.x && segment.y === snakeGame.food.y) {
             generateFood();
@@ -236,11 +410,9 @@ function generateFood() {
 function drawSnakeGame() {
     if (!snakeCtx || !snakeCanvas) return;
     
-    // Clear canvas
     snakeCtx.fillStyle = '#e8e8e8';
     snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
     
-    // Draw grid
     snakeCtx.strokeStyle = '#d0d0d0';
     snakeCtx.lineWidth = 1;
     for (let i = 0; i <= snakeGame.tileCount; i++) {
@@ -255,7 +427,6 @@ function drawSnakeGame() {
         snakeCtx.stroke();
     }
     
-    // Draw snake
     snakeGame.snake.forEach((segment, index) => {
         if (index === 0) {
             snakeCtx.fillStyle = '#000';
@@ -270,7 +441,6 @@ function drawSnakeGame() {
         );
     });
     
-    // Draw food (apple emoji style)
     snakeCtx.fillStyle = '#ff0000';
     snakeCtx.fillRect(
         snakeGame.food.x * snakeGame.gridSize + 2,
@@ -279,7 +449,6 @@ function drawSnakeGame() {
         snakeGame.gridSize - 4
     );
     
-    // Draw leaf on apple
     snakeCtx.fillStyle = '#00ff00';
     snakeCtx.fillRect(
         snakeGame.food.x * snakeGame.gridSize + snakeGame.gridSize / 2,
@@ -294,6 +463,8 @@ function gameOver() {
     snakeGame.isRunning = false;
     snakeGame.isPaused = false;
     
+    const finalScore = snakeGame.score;
+    
     if (!snakeCtx || !snakeCanvas) return;
     
     snakeCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -304,10 +475,23 @@ function gameOver() {
     snakeCtx.textAlign = 'center';
     snakeCtx.fillText('GAME OVER', snakeCanvas.width / 2, snakeCanvas.height / 2 - 20);
     snakeCtx.font = '16px Arial';
-    snakeCtx.fillText('Score: ' + snakeGame.score, snakeCanvas.width / 2, snakeCanvas.height / 2 + 20);
-    snakeCtx.fillText('Appuyez sur Démarrer pour rejouer', snakeCanvas.width / 2, snakeCanvas.height / 2 + 50);
+    snakeCtx.fillText('Score: ' + finalScore, snakeCanvas.width / 2, snakeCanvas.height / 2 + 20);
+    
+    // Vérifier si le score mérite d'être dans le leaderboard
+    const leaderboard = getLeaderboard();
+    const isTopScore = leaderboard.length < 10 || finalScore > leaderboard[leaderboard.length - 1].score;
+    
+    if (isTopScore && finalScore > 0) {
+        snakeCtx.fillText('🎉 Nouveau record ! 🎉', snakeCanvas.width / 2, snakeCanvas.height / 2 + 50);
+        
+        // Afficher le modal après un court délai
+        setTimeout(() => {
+            showPlayerNameModal(finalScore);
+        }, 1000);
+    } else {
+        snakeCtx.fillText('Appuyez sur Démarrer pour rejouer', snakeCanvas.width / 2, snakeCanvas.height / 2 + 50);
+    }
 }
-
 
 // ==============================
 // === CONTACT FORM (EmailJS) ===
