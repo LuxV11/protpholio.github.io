@@ -161,29 +161,46 @@
             </div>
             <div class="window-content">
                 <div class="snake-game-container">
+                    <!-- Score Info -->
                     <div class="game-info">
                         <div class="score-display">
                             <strong>Score:</strong> <span id="snake-score">0</span>
                         </div>
                         <div class="high-score-display">
-                            <strong>Record:</strong> <span id="snake-high-score">0</span>
+                            <strong>Meilleur:</strong> <span id="snake-high-score">0</span>
                         </div>
                     </div>
+
+                    <!-- Canvas -->
                     <canvas id="snake-canvas" width="400" height="400"></canvas>
+
+                    <!-- Controls -->
                     <div class="game-controls">
                         <button class="game-button" onclick="startSnakeGame()">▶ Démarrer</button>
                         <button class="game-button" onclick="pauseSnakeGame()">⏸ Pause</button>
                         <button class="game-button" onclick="resetSnakeGame()">🔄 Reset</button>
                     </div>
+
+                    <!-- Instructions -->
                     <div class="game-instructions">
                         <strong>Comment jouer :</strong><br>
                         Utilisez les flèches directionnelles ← ↑ → ↓<br>
                         Mangez les pommes 🍎 sans toucher les bords ou votre queue !
                     </div>
+
+                    <!-- LEADERBOARD -->
+                    <div class="leaderboard-container">
+                        <div class="leaderboard-header">
+                            🏆 TOP 10 MEILLEURS SCORES 🏆
+                        </div>
+                        <div class="leaderboard-list" id="leaderboard-list">
+                            <!-- Les scores seront insérés ici dynamiquement -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
+     
         <!-- Easter Egg Window -->
         <div id="easter-egg-window" class="window">
             <div class="window-header">
